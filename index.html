@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>Misi Harian V1.6</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f3f4f6;color:#111827}
+.container{max-width:680px;margin:auto;padding:18px}.header{background:#111827;color:white;border-radius:22px;padding:22px;margin-bottom:14px}
+.header h1{margin:0 0 6px;font-size:25px}.muted{color:#9ca3af;font-size:13px}
+.card{background:white;border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 4px 18px #0000000d}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.title{font-weight:800;font-size:18px}.big{font-size:30px;font-weight:900}
+.progress{height:12px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin:14px 0}.bar{height:100%;width:0;background:#111827;border-radius:99px;transition:.25s}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#f9fafb;border-radius:14px;padding:12px}.stat b{display:block;font-size:17px;margin-top:4px}
+input{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:12px;font-size:16px;outline:none}input:focus{border-color:#111827}
+label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}.field{margin-bottom:12px}
+button{border:0;border-radius:12px;padding:12px 15px;font-weight:800;cursor:pointer;background:#111827;color:white}
+button.secondary{background:#e5e7eb;color:#111827}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.invest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.invest{padding:13px;border-radius:15px;background:#f9fafb}.invest span{font-size:12px;color:#6b7280}.invest b{display:block;margin-top:4px;font-size:17px}
+.total{margin-top:12px;padding:14px;border-radius:14px;background:#111827;color:white}.total b{font-size:22px}
+.check{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f0f0f0}.check:last-child{border:0}.check input{width:20px;height:20px}
+.hidden{display:none}.success{color:#15803d;font-weight:800}.danger{color:#b91c1c;font-weight:800}
+.history-item{padding:12px 0;border-bottom:1px solid #eee}.history-item:last-child{border:0}
+.small{font-size:12px;color:#6b7280}.footer{text-align:center;color:#9ca3af;font-size:12px;padding:20px}
+@media(max-width:480px){.grid,.invest-grid{grid-template-columns:1fr 1fr}.big{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="muted">TERLAHIR MANUSIA</div>
+    <h1>Misi Harian</h1>
+    <div class="muted">Kerja secukupnya. Bangun aset setiap hari.</div>
+  </div>
+
+  <div class="card">
+    <div class="row"><div><div class="title">Target Grab</div><div class="muted">15 order / hari</div></div><div class="big" id="incomeDisplay">Rp0</div></div>
+    <div class="progress"><div class="bar" id="progressBar"></div></div>
+    <div class="row"><span id="orderText">0 / 15 order</span><span id="targetStatus"></span></div>
+    <div class="grid" style="margin-top:12px">
+      <div class="stat">Order<b id="ordersStat">0</b></div>
+      <div class="stat">Pendapatan<b id="incomeStat">Rp0</b></div>
+      <div class="stat">Rata-rata<b id="avgStat">Rp0</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row"><div><div class="title">Investasi Hari Ini</div><div class="muted">Target bisa kamu ubah sesuai kondisi</div></div><button onclick="toggleSettings()">⚙️ Atur</button></div>
+    <div class="invest-grid" style="margin-top:14px">
+      <div class="invest"><span>Bitcoin</span><b id="btcView">Rp20.000</b></div>
+      <div class="invest"><span>SOL</span><b id="solView">Rp10.000</b></div>
+      <div class="invest"><span>Emas</span><b id="goldView">Rp10.000</b></div>
+    </div>
+    <div class="total">Total target harian <b id="investTotal">Rp40.000</b></div>
+  </div>
+
+  <div class="card hidden" id="settings">
+    <div class="title">Atur Target Investasi</div>
+    <div class="muted" style="margin:5px 0 15px">Masukkan nominal rupiah. Setting tersimpan otomatis di perangkat ini.</div>
+    <div class="field"><label>Bitcoin</label><input id="btcInput" type="number" min="0" step="1000"></div>
+    <div class="field"><label>SOL</label><input id="solInput" type="number" min="0" step="1000"></div>
+    <div class="field"><label>Emas</label><input id="goldInput" type="number" min="0" step="1000"></div>
+    <div class="total">Total baru: <b id="settingsTotal">Rp40.000</b></div>
+    <div class="actions" style="margin-top:12px">
+      <button onclick="saveInvestSettings()">Simpan Target</button>
+      <button class="secondary" onclick="resetInvestSettings()">Reset 25K / 10K / 10K</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Input Hari Ini</div>
+    <div class="muted" style="margin:5px 0 15px">Update progres Grab kapan saja.</div>
+    <div class="grid">
+      <div class="field"><label>Order</label><input id="ordersInput" type="number" min="0" value="0"></div>
+      <div class="field"><label>Pendapatan</label><input id="incomeInput" type="number" min="0" value="0"></div>
+      <div class="field"><label>Pengeluaran</label><input id="expenseInput" type="number" min="0" value="0"></div>
+    </div>
+    <div class="actions">
+      <button onclick="updateToday()">Update</button>
+      <button class="secondary" onclick="saveDay()">Simpan Hari</button>
+    </div>
+    <div id="netResult" class="muted" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="title">Rundown Setelah Target</div>
+    <div class="check"><input type="checkbox" id="c1"><label for="c1">Reset: makan, mandi, istirahat & charge HP</label></div>
+    <div class="check"><input type="checkbox" id="c2"><label for="c2">Catat pemasukan & pengeluaran</label></div>
+    <div class="check"><input type="checkbox" id="c3"><label for="c3">Bangun aset: Adobe / digital product / konten</label></div>
+    <div class="check"><input type="checkbox" id="c4"><label for="c4">Waktu keluarga</label></div>
+    <div class="check"><input type="checkbox" id="c5"><label for="c5">Project / belajar (opsional)</label></div>
+  </div>
+
+  <div class="card">
+    <div class="row"><div><div class="title">Riwayat</div><div class="muted">Maksimal 90 hari</div></div><div class="big" id="streak">0🔥</div></div>
+    <div id="history"></div>
+    <div class="actions" style="margin-top:12px">
+      <button class="secondary" onclick="backup()">Backup</button>
+      <button class="secondary" onclick="document.getElementById('restoreFile').click()">Restore</button>
+      <input class="hidden" id="restoreFile" type="file" accept=".json" onchange="restore(event)">
+    </div>
+  </div>
+
+  <div class="footer">Misi Harian V1.6 • Sebuah karya tetap terlahir dari manusia.</div>
+</div>
+
+<script>
+const DEFAULT_INV={btc:25000,sol:10000,gold:10000};
+let inv=JSON.parse(localStorage.getItem('investTargets')||'null')||DEFAULT_INV;
+let today=JSON.parse(localStorage.getItem('todayData')||'null')||{orders:0,income:0,expense:0};
+let history=JSON.parse(localStorage.getItem('history')||'[]');
+
+function rupiah(n){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0)}
+function totalInv(){return (+inv.btc||0)+(+inv.sol||0)+(+inv.gold||0)}
+function render(){
+ document.getElementById('ordersInput').value=today.orders;
+ document.getElementById('incomeInput').value=today.income;
+ document.getElementById('expenseInput').value=today.expense;
+ document.getElementById('incomeDisplay').textContent=rupiah(today.income);
+ document.getElementById('ordersStat').textContent=today.orders;
+ document.getElementById('incomeStat').textContent=rupiah(today.income);
+ document.getElementById('avgStat').textContent=rupiah(today.orders?today.income/today.orders:0);
+ document.getElementById('orderText').textContent=`${today.orders} / 15 order`;
+ const pct=Math.min(100,(today.orders/15)*100);
+ document.getElementById('progressBar').style.width=pct+'%';
+ document.getElementById('targetStatus').innerHTML=today.orders>=15?'<span class="success">✓ TARGET TERCAPAI</span>':'';
+ document.getElementById('btcView').textContent=rupiah(inv.btc);
+ document.getElementById('solView').textContent=rupiah(inv.sol);
+ document.getElementById('goldView').textContent=rupiah(inv.gold);
+ document.getElementById('investTotal').textContent=rupiah(totalInv());
+ document.getElementById('settingsTotal').textContent=rupiah((+document.getElementById('btcInput').value||0)+(+document.getElementById('solInput').value||0)+(+document.getElementById('goldInput').value||0));
+ document.getElementById('netResult').textContent=`Bersih hari ini: ${rupiah(today.income-today.expense)}`;
+ renderHistory();
+}
+function updateToday(){
+ today={orders:Math.max(0,+document.getElementById('ordersInput').value||0),income:Math.max(0,+document.getElementById('incomeInput').value||0),expense:Math.max(0,+document.getElementById('expenseInput').value||0)};
+ localStorage.setItem('todayData',JSON.stringify(today));render();
+}
+function toggleSettings(){
+ const el=document.getElementById('settings');el.classList.toggle('hidden');
+ document.getElementById('btcInput').value=inv.btc;document.getElementById('solInput').value=inv.sol;document.getElementById('goldInput').value=inv.gold;render();
+}
+['btcInput','solInput','goldInput'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+ document.getElementById('settingsTotal').textContent=rupiah((+btcInput.value||0)+(+solInput.value||0)+(+goldInput.value||0));
+}));
+function saveInvestSettings(){
+ inv={btc:Math.max(0,+btcInput.value||0),sol:Math.max(0,+solInput.value||0),gold:Math.max(0,+goldInput.value||0)};
+ localStorage.setItem('investTargets',JSON.stringify(inv));render();document.getElementById('settings').classList.add('hidden');
+}
+function resetInvestSettings(){btcInput.value=25000;solInput.value=10000;goldInput.value=10000;saveInvestSettings()}
+function saveDay(){
+ updateToday();
+ const d=new Date().toISOString().slice(0,10);
+ history=history.filter(x=>x.date!==d);
+ history.unshift({date:d,...today,invest:{...inv},investTotal:totalInv()});
+ history=history.slice(0,90);localStorage.setItem('history',JSON.stringify(history));render();
+ alert('Hari ini tersimpan.');
+}
+function renderHistory(){
+ document.getElementById('streak').textContent=(history.length?history.length:0)+'🔥';
+ const box=document.getElementById('history');
+ box.innerHTML=history.slice(0,7).map(x=>`<div class="history-item"><b>${x.date}</b><div class="small">${x.orders} order • ${rupiah(x.income)} masuk • ${rupiah(x.expense)} keluar • Invest ${rupiah(x.investTotal||0)}</div></div>`).join('')||'<div class="muted" style="margin-top:12px">Belum ada riwayat tersimpan.</div>';
+}
+function backup(){
+ const data={version:'1.6',investTargets:inv,todayData:today,history};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='misi-harian-backup.json';a.click();URL.revokeObjectURL(a.href);
+}
+function restore(e){
+ const f=e.target.files[0];if(!f)return;
+ const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.investTargets)inv=d.investTargets;if(d.todayData)today=d.todayData;if(Array.isArray(d.history))history=d.history;localStorage.setItem('investTargets',JSON.stringify(inv));localStorage.setItem('todayData',JSON.stringify(today));localStorage.setItem('history',JSON.stringify(history));render();alert('Backup berhasil dipulihkan.')}catch(err){alert('File backup tidak valid.')}};r.readAsText(f);
+}
+render();
+</script>
+</body>
+</html>
