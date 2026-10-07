@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#111827">
-<title>Misi Harian V1.6</title>
+<title>Misi Harian V1.7</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f3f4f6;color:#111827}
 .container{max-width:680px;margin:auto;padding:18px}.header{background:#111827;color:white;border-radius:22px;padding:22px;margin-bottom:14px}
@@ -102,12 +102,19 @@ button.secondary{background:#e5e7eb;color:#111827}.actions{display:flex;gap:8px;
     </div>
   </div>
 
-  <div class="footer">Misi Harian V1.6 • Sebuah karya tetap terlahir dari manusia.</div>
+  <div class="footer">Misi Harian V1.7 • Sebuah karya tetap terlahir dari manusia.</div>
 </div>
 
 <script>
 const DEFAULT_INV={btc:25000,sol:10000,gold:10000};
-let inv=JSON.parse(localStorage.getItem('investTargets')||'null')||DEFAULT_INV;
+let savedInv=JSON.parse(localStorage.getItem('investTargets')||'null');
+let inv=savedInv||DEFAULT_INV;
+// One-time migration: if the previous app still has the original 20K/10K/10K
+// untouched default saved, replace it with the new 25K/10K/10K default.
+if(savedInv && +savedInv.btc===20000 && +savedInv.sol===10000 && +savedInv.gold===10000){
+  inv={...DEFAULT_INV};
+  localStorage.setItem('investTargets',JSON.stringify(inv));
+}
 let today=JSON.parse(localStorage.getItem('todayData')||'null')||{orders:0,income:0,expense:0};
 let history=JSON.parse(localStorage.getItem('history')||'[]');
 
