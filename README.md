@@ -1,1 +1,0 @@
-# Web-simple-Terlahir-Manusia
