@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Misi Harian</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#121933;
+      --card2:#182143;
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --line:#26304f;
+      --accent:#7c3aed;
+      --accent2:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(124,58,237,.22), transparent 32%),
+        linear-gradient(180deg,#0a0f1f,#0b1020 45%,#0a0e1a);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .app{
+      width:min(100%,520px);
+      margin:auto;
+      padding:20px 16px 110px;
+    }
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .eyebrow{font-size:12px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+    h1{font-size:28px;margin:4px 0 0}
+    .pill{
+      padding:9px 12px;border-radius:999px;background:rgba(124,58,237,.16);
+      color:#c4b5fd;font-weight:700;font-size:12px;border:1px solid rgba(124,58,237,.25)
+    }
+    .card{
+      background:linear-gradient(180deg,rgba(24,33,67,.97),rgba(18,25,51,.97));
+      border:1px solid rgba(148,163,184,.14);
+      border-radius:var(--radius);
+      padding:18px;
+      margin-bottom:14px;
+      box-shadow:var(--shadow);
+    }
+    .hero{padding:20px}
+    .row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .label{font-size:13px;color:var(--muted)}
+    .big{font-size:34px;font-weight:850;letter-spacing:-.03em;margin:6px 0}
+    .sub{color:var(--muted);font-size:13px}
+    .progress{
+      height:12px;background:#0e1530;border-radius:999px;overflow:hidden;margin:16px 0 10px;border:1px solid #222b4b
+    }
+    .bar{height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#a78bfa);transition:.3s}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .stat{background:#0e1530;border:1px solid #222b4b;border-radius:16px;padding:12px}
+    .stat b{display:block;font-size:18px;margin-top:4px}
+    .section-title{font-size:16px;font-weight:800;margin-bottom:12px}
+    .inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    input,button{
+      width:100%;border-radius:14px;border:1px solid #2c365a;
+      background:#0d1430;color:var(--text);padding:13px 14px;font-size:15px;outline:none;
+    }
+    input:focus{border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(124,58,237,.14)}
+    button{
+      border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);
+      font-weight:800;cursor:pointer;
+    }
+    button.secondary{background:#1e293b;color:#e2e8f0;border:1px solid #334155}
+    .task{
+      display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(148,163,184,.11)
+    }
+    .task:last-child{border-bottom:none}
+    .check{
+      width:28px;height:28px;display:grid;place-items:center;border-radius:9px;
+      background:#0d1430;border:1px solid #334155;flex:0 0 auto;cursor:pointer;
+    }
+    .task.done .check{background:#14532d;border-color:#22c55e}
+    .task.done .task-name{text-decoration:line-through;color:#64748b}
+    .task-time{font-size:12px;color:#a78bfa;margin-bottom:2px}
+    .task-name{font-weight:700}
+    .task-desc{font-size:12px;color:var(--muted);margin-top:3px}
+    .money-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .money-box{
+      background:#0d1430;border:1px solid #273253;border-radius:16px;padding:14px
+    }
+    .money-box .value{font-size:20px;font-weight:800;margin-top:4px}
+    .invest{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+    .coin{background:#0d1430;border:1px solid #273253;border-radius:15px;padding:12px;text-align:center}
+    .coin b{display:block;margin-top:4px}
+    .success{
+      display:none;background:linear-gradient(135deg,rgba(34,197,94,.20),rgba(16,185,129,.10));
+      border:1px solid rgba(34,197,94,.35);border-radius:18px;padding:14px;margin-top:14px
+    }
+    .success.show{display:block}
+    .success strong{color:#86efac}
+    .footer-nav{
+      position:fixed;left:50%;transform:translateX(-50%);bottom:14px;
+      width:min(calc(100% - 24px),496px);
+      background:rgba(15,23,42,.92);backdrop-filter:blur(18px);
+      border:1px solid rgba(148,163,184,.18);border-radius:22px;
+      display:grid;grid-template-columns:repeat(3,1fr);padding:8px;box-shadow:var(--shadow)
+    }
+    .navbtn{
+      padding:10px 8px;background:transparent;border:0;color:var(--muted);font-size:12px
+    }
+    .navbtn.active{color:white;background:#1e293b}
+    .tiny{font-size:11px;color:var(--muted)}
+    .right{text-align:right}
+    @media (max-width:390px){
+      .big{font-size:30px}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}
+    }
+  </style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Misi Harian">
+
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <div class="eyebrow">Terlahir Manusia</div>
+        <h1>Misi Harian</h1>
+      </div>
+      <div class="pill" id="dayLabel">Hari ini</div>
+    </header>
+
+    <section class="card hero" id="dashboard">
+      <div class="row">
+        <div>
+          <div class="label">Target Grab hari ini</div>
+          <div class="big" id="incomeDisplay">Rp0</div>
+          <div class="sub">Target Rp150.000 • 15 order</div>
+        </div>
+        <div class="right">
+          <div class="label">Status</div>
+          <div id="statusText" style="font-weight:800;margin-top:4px">Mulai misi</div>
+        </div>
+      </div>
+
+      <div class="progress"><div class="bar" id="incomeBar"></div></div>
+      <div class="row tiny"><span id="progressText">0% tercapai</span><span id="remainingText">Sisa Rp150.000</span></div>
+
+      <div class="stats" style="margin-top:14px">
+        <div class="stat"><span class="label">Order</span><b id="ordersDisplay">0 / 15</b></div>
+        <div class="stat"><span class="label">Rata/order</span><b id="avgDisplay">Rp0</b></div>
+        <div class="stat"><span class="label">Target selesai</span><b>12:30–13:00</b></div>
+      </div>
+
+      <div class="inputs" style="margin-top:14px">
+        <input type="number" id="incomeInput" placeholder="Pendapatan (Rp)" min="0"/>
+        <input type="number" id="ordersInput" placeholder="Jumlah order" min="0"/>
+      </div>
+      <button style="margin-top:10px" onclick="saveGrab()">Update Progress</button>
+
+      <div class="success" id="successBox">
+        <strong>🔥 TARGET TERCAPAI!</strong>
+        <div style="margin-top:5px">Sesi Grab selesai. Sekarang masuk mode reset dan lanjut ke misi berikutnya.</div>
+      </div>
+    </section>
+
+    <section class="card" id="rundown">
+      <div class="section-title">Rundown Setelah Target</div>
+      <div class="task" data-task="reset">
+        <div class="check" onclick="toggleTask(this)">✓</div>
+        <div>
+          <div class="task-time">13.00 – 14.00</div>
+          <div class="task-name">Reset</div>
+          <div class="task-desc">Pulang, makan, mandi, istirahat, charge HP.</div>
+        </div>
+      </div>
+      <div class="task" data-task="finance">
+        <div class="check" onclick="toggleTask(this)">✓</div>
+        <div>
+          <div class="task-time">14.00 – 15.00</div>
+          <div class="task-name">Keuangan</div>
+          <div class="task-desc">Catat pemasukan, pengeluaran, dan alokasi investasi.</div>
+        </div>
+      </div>
+      <div class="task" data-task="asset">
+        <div class="check" onclick="toggleTask(this)">✓</div>
+        <div>
+          <div class="task-time">15.00 – 17.00</div>
+          <div class="task-name">Bangun Aset</div>
+          <div class="task-desc">Target 1 aset: Adobe Contributor / produk digital / konten.</div>
+        </div>
+      </div>
+      <div class="task" data-task="family">
+        <div class="check" onclick="toggleTask(this)">✓</div>
+        <div>
+          <div class="task-time">17.00 – 19.00</div>
+          <div class="task-name">Waktu Keluarga</div>
+          <div class="task-desc">Stop kerja. Hadir penuh untuk keluarga.</div>
+        </div>
+      </div>
+      <div class="task" data-task="project">
+        <div class="check" onclick="toggleTask(this)">✓</div>
+        <div>
+          <div class="task-time">19.00 – 20.30</div>
+          <div class="task-name">Project / Belajar</div>
+          <div class="task-desc">NIVO, website Terlahir Manusia, atau skill baru. Opsional.</div>
+        </div>
+      </div>
+      <div class="task" data-task="closing">
+        <div class="check" onclick="toggleTask(this)">✓</div>
+        <div>
+          <div class="task-time">20.30 – 21.00</div>
+          <div class="task-name">Closing Hari</div>
+          <div class="task-desc">Review uang, investasi, aset, dan progress misi.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="finance">
+      <div class="section-title">Keuangan Hari Ini</div>
+      <div class="inputs">
+        <input type="number" id="fuelInput" placeholder="Bensin" min="0"/>
+        <input type="number" id="foodInput" placeholder="Makan" min="0"/>
+      </div>
+      <input type="number" id="otherInput" placeholder="Pengeluaran lain" min="0" style="margin-top:10px"/>
+      <button class="secondary" style="margin-top:10px" onclick="saveFinance()">Hitung Bersih</button>
+
+      <div class="money-grid" style="margin-top:14px">
+        <div class="money-box">
+          <div class="label">Pendapatan bersih</div>
+          <div class="value" id="netDisplay">Rp0</div>
+        </div>
+        <div class="money-box">
+          <div class="label">Total pengeluaran</div>
+          <div class="value" id="expenseDisplay">Rp0</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:16px">Misi Investasi Harian</div>
+      <div class="invest">
+        <div class="coin"><span class="label">BTC</span><b>Rp20K</b></div>
+        <div class="coin"><span class="label">SOL</span><b>Rp10K</b></div>
+        <div class="coin"><span class="label">Emas</span><b>Rp10K</b></div>
+      </div>
+      <div class="tiny" style="margin-top:10px">Target investasi harian: Rp40.000</div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Misi 90 Hari</div>
+      <div class="row">
+        <div>
+          <div class="label">Hari konsisten</div>
+          <div class="big" style="font-size:28px" id="streakDisplay">0 hari</div>
+        </div>
+        <button style="width:auto;padding:12px 16px" onclick="completeDay()">Tutup Hari</button>
+      </div>
+      <div class="progress"><div class="bar" id="streakBar"></div></div>
+      <div class="tiny" id="streakText">0 / 90 hari</div>
+    </section>
+
+    <section class="card" id="history">
+      <div class="section-title">Riwayat Misi</div>
+      <div class="row" style="margin-bottom:12px">
+        <div class="tiny" id="historySummary">Belum ada riwayat tersimpan.</div>
+        <button class="secondary" style="width:auto;padding:10px 12px" onclick="clearHistory()">Hapus</button>
+      </div>
+      <div id="historyList"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Backup Data</div>
+      <div class="tiny" style="margin-bottom:12px">
+        Simpan backup ke file HP agar data bisa dipulihkan kalau browser terhapus atau pindah perangkat.
+      </div>
+      <div class="inputs">
+        <button onclick="backupData()">⬇ Backup</button>
+        <button class="secondary" onclick="document.getElementById('restoreInput').click()">⬆ Restore</button>
+      </div>
+      <input id="restoreInput" type="file" accept=".json,application/json" style="display:none" onchange="restoreData(event)">
+      <div class="tiny" id="backupStatus" style="margin-top:10px"></div>
+    </section>
+  </div>
+
+  <nav class="footer-nav">
+    <button class="navbtn active" onclick="scrollToId('dashboard',this)">Hari Ini</button>
+    <button class="navbtn" onclick="scrollToId('rundown',this)">Rundown</button>
+    <button class="navbtn" onclick="scrollToId('history',this)">Riwayat</button>
+    <button class="navbtn" onclick="scrollToId('finance',this)">Keuangan</button>
+  </nav>
+
+<script>
+const TARGET_INCOME = 150000;
+const TARGET_ORDERS = 15;
+const KEY_CURRENT = "misiHarian_current_v15";
+const KEY_HISTORY = "misiHarian_history_v15";
+
+const $ = (id) => document.getElementById(id);
+const rupiah = (n) => "Rp" + new Intl.NumberFormat("id-ID").format(Number(n || 0));
+
+function readCurrent(){
+  try { return JSON.parse(localStorage.getItem(KEY_CURRENT) || "{}"); }
+  catch(e){ return {}; }
+}
+function writeCurrent(data){
+  localStorage.setItem(KEY_CURRENT, JSON.stringify(data));
+}
+function readHistory(){
+  try { return JSON.parse(localStorage.getItem(KEY_HISTORY) || "[]"); }
+  catch(e){ return []; }
+}
+function writeHistory(data){
+  localStorage.setItem(KEY_HISTORY, JSON.stringify(data));
+}
+
+function todayKey(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function updateGrab(income, orders){
+  const pct = Math.min(100, Math.round((income / TARGET_INCOME) * 100));
+  $("incomeDisplay").textContent = rupiah(income);
+  $("incomeBar").style.width = pct + "%";
+  $("progressText").textContent = pct + "% tercapai";
+  $("remainingText").textContent =
+    income >= TARGET_INCOME ? "Target selesai" : "Sisa " + rupiah(TARGET_INCOME - income);
+  $("ordersDisplay").textContent = orders + " / " + TARGET_ORDERS;
+  $("avgDisplay").textContent = orders ? rupiah(Math.round(income / orders)) : "Rp0";
+
+  const hit = income >= TARGET_INCOME || orders >= TARGET_ORDERS;
+  $("statusText").textContent = hit ? "Target tercapai 🔥" : "Kejar target";
+  $("successBox").classList.toggle("show", hit);
+}
+
+function updateFinance(data){
+  const expense = Number(data.fuel||0) + Number(data.food||0) + Number(data.other||0);
+  $("expenseDisplay").textContent = rupiah(expense);
+  $("netDisplay").textContent = rupiah(Number(data.income||0) - expense);
+}
+
+function saveGrab(){
+  const data = readCurrent();
+  data.income = Number($("incomeInput").value) || 0;
+  data.orders = Number($("ordersInput").value) || 0;
+  data.updatedAt = new Date().toISOString();
+  writeCurrent(data);
+  updateGrab(data.income, data.orders);
+  updateFinance(data);
+  showMessage("Progress Grab tersimpan ✓");
+}
+
+function saveFinance(){
+  const data = readCurrent();
+  data.fuel = Number($("fuelInput").value) || 0;
+  data.food = Number($("foodInput").value) || 0;
+  data.other = Number($("otherInput").value) || 0;
+  data.updatedAt = new Date().toISOString();
+  writeCurrent(data);
+  updateFinance(data);
+  showMessage("Keuangan tersimpan ✓");
+}
+
+function toggleTask(el){
+  const task = el.closest(".task");
+  task.classList.toggle("done");
+  const data = readCurrent();
+  data.tasks = data.tasks || {};
+  data.tasks[task.dataset.task] = task.classList.contains("done");
+  writeCurrent(data);
+}
+
+function completeDay(){
+  const data = readCurrent();
+  const date = todayKey();
+  const expense = Number(data.fuel||0) + Number(data.food||0) + Number(data.other||0);
+
+  let history = readHistory();
+  const entry = {
+    date,
+    income:Number(data.income||0),
+    orders:Number(data.orders||0),
+    fuel:Number(data.fuel||0),
+    food:Number(data.food||0),
+    other:Number(data.other||0),
+    expense,
+    net:Number(data.income||0)-expense,
+    investment:40000
+  };
+
+  const index = history.findIndex(x => x.date === date);
+  if(index >= 0) history[index] = entry;
+  else history.unshift(entry);
+  history.sort((a,b) => b.date.localeCompare(a.date));
+  writeHistory(history.slice(0,90));
+
+  if(data.lastComplete !== date){
+    data.streak = Number(data.streak||0) + 1;
+    data.lastComplete = date;
+    writeCurrent(data);
+  }
+  updateStreak(Number(data.streak||0));
+  renderHistory();
+  showMessage("Hari ini masuk riwayat ✓");
+}
+
+function updateStreak(n){
+  $("streakDisplay").textContent = n + " hari";
+  $("streakBar").style.width = Math.min(100,(n/90)*100) + "%";
+  $("streakText").textContent = n + " / 90 hari";
+}
+
+function renderHistory(){
+  const history = readHistory();
+  if(!history.length){
+    $("historySummary").textContent = "Belum ada riwayat tersimpan.";
+    $("historyList").innerHTML = "";
+    return;
+  }
+
+  const total = history.reduce((sum,x)=>sum+Number(x.income||0),0);
+  $("historySummary").textContent =
+    `${history.length} hari • total ${rupiah(total)} • rata-rata ${rupiah(Math.round(total/history.length))}`;
+
+  $("historyList").innerHTML = history.slice(0,15).map(x => {
+    const date = new Date(x.date + "T00:00:00").toLocaleDateString("id-ID",
+      {day:"numeric",month:"short",year:"numeric"});
+    return `<div style="padding:12px 0;border-bottom:1px solid rgba(148,163,184,.11)">
+      <div class="row">
+        <div><b>${date}</b><div class="tiny">${x.orders} order • pengeluaran ${rupiah(x.expense)}</div></div>
+        <div class="right"><b>${rupiah(x.income)}</b><div class="tiny">bersih ${rupiah(x.net)}</div></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function clearHistory(){
+  if(confirm("Hapus semua riwayat?")){
+    localStorage.removeItem(KEY_HISTORY);
+    renderHistory();
+  }
+}
+
+function backupData(){
+  const payload = {
+    app:"Misi Harian",
+    version:"1.5",
+    exportedAt:new Date().toISOString(),
+    current:readCurrent(),
+    history:readHistory()
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "misi-harian-backup-" + todayKey() + ".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showMessage("Backup berhasil dibuat ✓");
+}
+
+function restoreData(event){
+  const file = event.target.files && event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    try{
+      const payload = JSON.parse(reader.result);
+      if(payload.app !== "Misi Harian" || !payload.current) throw new Error("invalid");
+      writeCurrent(payload.current);
+      writeHistory(Array.isArray(payload.history) ? payload.history : []);
+      location.reload();
+    }catch(e){
+      showMessage("File backup tidak valid.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function showMessage(msg){
+  let el = $("backupStatus");
+  if(el) {
+    el.textContent = msg;
+    setTimeout(()=>{ if(el.textContent === msg) el.textContent = ""; }, 2500);
+  }
+}
+
+function scrollToId(id,btn){
+  const el = $(id);
+  if(el) el.scrollIntoView({behavior:"smooth"});
+  document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+}
+
+function load(){
+  const data = readCurrent();
+  $("incomeInput").value = data.income ?? "";
+  $("ordersInput").value = data.orders ?? "";
+  $("fuelInput").value = data.fuel ?? "";
+  $("foodInput").value = data.food ?? "";
+  $("otherInput").value = data.other ?? "";
+
+  document.querySelectorAll(".task").forEach(t=>{
+    if(data.tasks && data.tasks[t.dataset.task]) t.classList.add("done");
+  });
+
+  updateGrab(Number(data.income||0), Number(data.orders||0));
+  updateFinance(data);
+  updateStreak(Number(data.streak||0));
+  renderHistory();
+
+  $("dayLabel").textContent = new Date().toLocaleDateString("id-ID",
+    {weekday:"short",day:"numeric",month:"short"});
+}
+
+document.addEventListener("DOMContentLoaded", load);
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
+}
+</script>
+
+</body>
+</html>
